@@ -51,9 +51,24 @@
     </table>
     <div style="margin-top: 10px">book: {{ book }}</div>
     <div style="margin-top: 10px">score: {{ score }}</div>
+    <div style="margin-top: 10px">calcScore: {{ calcScore }}</div>
     <button @click="changePerMsg">点我改变信息</button>
-    <button @click="changeBook">点我更换书籍(mutations)</button>
+    <button @click="changeBookByCom">点我更换书籍(mutations)</button>
+    <button @click="mapMutaChangeBook('VueXXXX')">点我更换书籍(mapMutations)</button>
     <button @click="changeBookFormAct">点我更换书籍(actions)</button>
+    <button @click="mapActChangeBook('webpack')">点我更换书籍(mapActions)</button>
+    <br /><br /><br />
+    <h3>模块化</h3>
+    -------------state------------------
+    <div>count:{{ count }}</div>
+    <div>mapState-dog:{{ dog }}</div>
+    ----------getters------------
+    <div>doubleCount:{{ doubleCount }}</div>
+    <div>mapGetters-car:{{ car }}</div>
+    <button @click="increment">increment count(mutations)</button>
+    <button @click="mapMutationsIncrement(10)">mapMutations-increment count(mutations)</button>
+    <button @click="disIncrement">increment count(actions)</button>
+    <button @click="mapActionsDisIncrement(20)">mapActions-increment count(actions)</button>
   </div>
 </template>
 
@@ -78,7 +93,7 @@
      // ]),
  
  */
-import { mapState } from "vuex";
+import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
 // import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
 
 export default {
@@ -88,6 +103,9 @@ export default {
   },
   data() {
     return {};
+  },
+  mounted() {
+    // console.log(this.$store.getters.moduleA);
   },
   computed: {
     // store已注入到根组件  所以可以使用  this.$store.state 访问
@@ -103,6 +121,41 @@ export default {
     score() {
       return this.$store.getters.calcScore;
     },
+    ...mapGetters(["calcScore"]), // 辅助函数
+
+
+
+
+
+
+
+
+
+
+    // 模块化
+
+    // state
+    count() {
+      return this.$store.state.moduleA.count;
+    },
+    ...mapState({
+      dog: (state) => state.moduleA.dog,
+    }),
+
+    // getters
+    doubleCount() {
+      return this.$store.getters["moduleA/doubleCount"];
+    },
+
+    // 获取moduleA getters里的 car
+    /* 
+       moduleA 指的是模块A （模块名）
+       第一个car是我自定义的名称
+       第二个car是对应moduleA里的getters里的car       
+    */
+    ...mapGetters("moduleA", {
+      car: "car",
+    }),
   },
   methods: {
     // mutations
@@ -113,18 +166,61 @@ export default {
         sex: "woman",
       });
     },
-    changeBook() {
+    changeBookByCom() {
       this.$store.commit("changeBook", "JavaScript");
+    },
+    // ----------mapMutations-----------
+    ...mapMutations(["changeBook"]), // 引入mutations函数
+    mapMutaChangeBook(bk) {
+      // 使用引入的函数
+      this.changeBook(bk);
     },
 
     // actions
     changeBookFormAct() {
-      let bk = 'Vue+Vuex';
-      this.$store.dispatch('changeBookAct',bk).then(() => {
+      let bk = "Vue+Vuex";
+      this.$store.dispatch("changeBookAct", bk).then(() => {
         // 分发完之后的异步操作, 比如存储到localStorage
-        window.localStorage.setItem('book', bk);
-      })
+        window.localStorage.setItem("book", bk);
+      });
+    },
+    // ----------mapActions-----------
+    ...mapActions(['changeBookAct']),
+    mapActChangeBook(bk) {
+      this.changeBookAct(bk);
+    },
+
+
+
+
+
+
+
+    // 模块化
+    increment() {
+      // mutations
+      this.$store.commit("moduleA/increment", 6);
+    },
+    ...mapMutations('moduleA',{
+      mapMutaIncrement: 'increment'
+    }),
+    mapMutationsIncrement(num){
+       this.mapMutaIncrement(num);
+    },
+
+
+    disIncrement() {
+      // actions
+      let num = 999;
+      this.$store.dispatch("moduleA/disIncrement", num);
+    },
+    ...mapActions('moduleA',{
+      mapActDisIncrement: 'disIncrement'
+    }),
+    mapActionsDisIncrement(num) {
+      this.mapActDisIncrement(num);
     }
+    
   },
 };
 </script>

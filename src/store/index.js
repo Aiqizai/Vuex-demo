@@ -56,5 +56,44 @@ export default new Vuex.Store({
     }
 
   },
-  modules: {}
+  modules: {
+
+    // 对于模块内部的 mutation 和 getter，接收的第一个参数是模块的局部状态对象。
+
+    moduleA: {
+
+      // 开启命名空间
+      namespaced: true,
+
+      state: () => ({ // 模块内的状态已经是嵌套的了，使用 `namespaced` 属性不会对其产生影响
+        count: 0,
+        car: '五菱',
+        dog: '小花'
+      }),
+
+      getters: { // getters['moduleA/doubleCount']
+        doubleCount(state) {
+          return state.count * 2;
+        },
+        car(state) {
+          return state.car + '神车'
+        }
+      },
+
+      mutations: { // commit('moduleA/increment')
+        increment(state, num) {
+          // 这里的state对象是模块的局部状态
+          state.count += num;
+        }
+      },
+
+      actions: { // dispatch('moduleA/increment')
+        disIncrement({commit}, data) {
+           commit('increment',data)
+        },
+      },
+
+    }
+
+  }
 })
