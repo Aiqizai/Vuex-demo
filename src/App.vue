@@ -2,11 +2,23 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/about">About</router-link> |
+      <router-link to="/render" :test="test">Render</router-link>
+      <router-link to="/rendertest">RenderTest</router-link>
     </div>
     <router-view/>
   </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      test: 'test'
+    }
+  }
+}
+</script>
 
 <style>
 #app {
